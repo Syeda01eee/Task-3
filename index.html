@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f0f0, #d9e4f5);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .todo-container {
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        .todo-container h1 {
+            text-align: center;
+            color: #4a90e2;
+        }
+        .todo-input {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .todo-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        .todo-input button {
+            padding: 10px;
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .todo-input button:hover {
+            background: #357ab7;
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .todo-item.completed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .todo-item button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .todo-item .delete-btn {
+            color: #e74c3c;
+        }
+        .todo-item .complete-btn {
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1>To-Do List</h1>
+        <div class="todo-input">
+            <input type="text" id="taskInput" placeholder="Add a new task..." />
+            <button id="addTaskBtn">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+    </div>
+
+    <script>
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const todoList = document.getElementById('todoList');
+
+        // Load tasks from localStorage
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        const saveTasks = () => {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        };
+
+        const renderTasks = () => {
+            todoList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+                
+                li.innerHTML = `
+                    <span>${task.text}</span>
+                    <div>
+                        <button class="complete-btn" onclick="toggleComplete(${index})">✔</button>
+                        <button class="delete-btn" onclick="deleteTask(${index})">✖</button>
+                    </div>
+                `;
+                todoList.appendChild(li);
+            });
+        };
+
+        const addTask = () => {
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                tasks.push({ text: taskText, completed: false });
+                saveTasks();
+                renderTasks();
+                taskInput.value = '';
+            }
+        };
+
+        const toggleComplete = (index) => {
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks();
+            renderTasks();
+        };
+
+        const deleteTask = (index) => {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        };
+
+        // Event listeners
+        addTaskBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        // Initial render
+        renderTasks();
+    </script>
+</body>
+</html>
